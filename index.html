@@ -351,3 +351,206 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration and Interaction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .interaction {
+            text-align: center;
+        }
+        .interaction a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .coins-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="coins-display hidden" id="coins-display">Coins: 0</div>
+
+    <div class="container" id="welcome-screen">
+        <h2>Welcome!</h2>
+        <p>Choose an option:</p>
+        <div class="form-group">
+            <button onclick="showElement('login-form')">Login</button>
+        </div>
+        <div class="form-group">
+            <button onclick="showElement('register-form')">Register</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="register-form">
+        <h2>Register</h2>
+        <div class="form-group">
+            <label for="register-username">Username</label>
+            <input type="text" id="register-username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" placeholder="Enter your password">
+        </div>
+        <div class="form-group">
+            <button onclick="registerUser()">Register</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="login-form">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password">
+        </div>
+        <div class="form-group">
+            <button onclick="loginUser()">Login</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="interaction-page">
+        <h2>Welcome!</h2>
+        <p>You have <span id="coins">50</span> coins.</p>
+        <div class="form-group">
+            <label for="video-link">Add a TikTok Video/Profile Link</label>
+            <input type="text" id="video-link" placeholder="Enter a TikTok link">
+        </div>
+        <div class="form-group">
+            <button onclick="addVideo()">Add Link</button>
+        </div>
+        <p id="videos-list"></p>
+        <p>Follow me on TikTok: <a href="https://tiktok.com/@yourprofile" target="_blank">@yourprofile</a></p>
+    </div>
+
+    <script>
+        const users = [];
+        let currentUser = null;
+
+        function showElement(id) {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function registerUser() {
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+
+            if (username && password) {
+                const existingUser = users.find(u => u.username === username);
+                if (existingUser) {
+                    alert('Username already exists. Please choose a different username.');
+                } else {
+                    users.push({ username, password, coins: 50, videos: [] });
+                    alert('Registration successful!');
+                    showElement('login-form');
+                }
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        function loginUser() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                alert('Login successful!');
+                document.getElementById('coins').textContent = user.coins;
+                document.getElementById('coins-display').textContent = `Coins: ${user.coins}`;
+                document.getElementById('coins-display').classList.remove('hidden');
+                showElement('interaction-page');
+            } else {
+                alert('Invalid username or password.');
+            }
+        }
+
+        function addVideo() {
+            const link = document.getElementById('video-link').value;
+
+            if (currentUser.coins >= 50) {
+                if (link) {
+                    currentUser.coins -= 50;
+                    currentUser.videos.push(link);
+                    document.getElementById('coins').textContent = currentUser.coins;
+                    document.getElementById('coins-display').textContent = `Coins: ${currentUser.coins}`;
+                    alert('Video added successfully!');
+                    document.getElementById('videos-list').innerHTML += `<p><a href="${link}" target="_blank">${link}</a></p>`;
+                } else {
+                    alert('Please enter a valid link.');
+                }
+            } else {
+                alert('You need at least 50 coins to add a video.');
+            }
+        }
+
+        // Initialize welcome screen
+        showElement('welcome-screen');
+    </script>
+</body>
+</html>
